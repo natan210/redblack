@@ -1,0 +1,289 @@
+// --== CS400 File Header Information ==--
+// Name: Nathaniel Israel
+// Email: nwisrael@wisc.edu
+// Team: BD Blue
+// Role: Frontend
+// TA: Brianna
+// Lecturer: Gary Dahl
+// Notes to Grader: <optional extra notes>
+import java.util.Scanner;
+public class FrontEnd {
+/**
+ * Main method, initializes a backend
+ * @param args a CSV file
+ */
+  public static void main(String args[]) {
+    Backend b = new Backend(args);
+    b.setMode(0);    
+    run(b);
+  }
+  /**
+   * Initializes the scanner, then runs the program
+   * @param Backend b 
+   */
+  public static void run(Backend b) {
+    Scanner scnr = new Scanner(System.in);
+    basemode(b, scnr);
+    scnr.close();
+  }
+  
+  /**
+   * Base mode. In this mode, users have the option to start the battlegreoup, switching to 
+   * battlegroup mode, or can exit the program altogether
+   * @param b backend 
+   * @param scnr for taking in user input
+   */
+  public static void basemode(Backend b, Scanner scnr) {
+   
+    System.out.println("\n-------------------------------------------------------"); 
+    System.out.print("Welcome to the pokemon battle simulator!");
+    boolean validinput = false;
+    do {
+      System.out.println("\n--------------------------------------------------------"); 
+      System.out.println("Type 'start' to create the pokemon battlegroup, or 'x' to exit the "
+          + "program");
+      if (!scnr.hasNext()) {
+     return;
+      }
+     String res = scnr.nextLine();
+      if (res.equalsIgnoreCase("start")) {
+       
+        System.out.println("Entering the battlegroup");
+        battlegroup(b, scnr); 
+      }
+      else if (res.equalsIgnoreCase("x")) {
+        System.out.println("Exiting the program");
+        return; 
+       
+      }
+      else {
+        System.out.println(res);
+        System.out.println("Not a valid input, please try again");
+      }
+    }while (!validinput);
+    
+    
+  }
+  /**
+   * In this mode, users have the option of getting the average stats of their pokemon group, going
+   * to the add mode to add a pokemon, clearing the entire battlegroup, or returning to the basemode
+   * @param b backend
+   * @param scnr scanner
+   */
+  public static void battlegroup(Backend b, Scanner scnr) {
+    
+    boolean validinput = false;
+    do {
+      System.out.println("\n------------------------------------------------------");
+      System.out.println("You are in battlegroup mode");
+      System.out.println("\nHere are your current pokemon: ");
+      PokemonInterface[] list = b.getTeam(); //copying all pokemon to an array, then listing the content
+      for (int i = 0; i < list.length; i++) {
+        System.out.println(list[i]);
+      }
+    
+      System.out.println("\nPress 'add' to access the add mode, 'getAvg' to get the average total of "
+          + "current pokemon,\n'clear' to clear the current battlegroup, or 'x' to return to base"
+          + " mode\n");
+      
+      
+      String res = scnr.nextLine();
+      if (res.equalsIgnoreCase("add")) {
+        System.out.println("You are now going to the add mode");
+        add(b, scnr);
+        
+      }
+      else if (res.equalsIgnoreCase("getAvg")) {
+        System.out.println("The average value of your pokemon is " + b.getAvg());
+        
+      }
+      else if (res.equalsIgnoreCase("clear")) {
+        b.clearTeam();
+        System.out.println("The battlegroup has been cleared");
+      }
+      else if (res.equalsIgnoreCase("x")) {
+        System.out.println("Returning to basemode");
+        
+        return;
+      }
+      else {
+        // if no valid input, then giving another prompt
+        System.out.println("Not a valid input, please try again");
+      }
+    }while (!validinput);
+   
+    
+  }
+  /**
+   * In this mode, users have the option to add a pokemon. They can get the most powerful pokemon, 
+   * the least powerful pokemon, or get them in either ascending or descending order. With the last 
+   * two, it shows them page by page. 
+   * @param b backend
+   * @param scnr Scanner
+   */
+  public static void add(Backend b, Scanner scnr) {
+   
+  
+  boolean validinput = false;
+  do {
+    System.out.println("\n-------------------------------------------------------");
+    System.out.println("You are in add mode");
+    System.out.println("\nHere you can find potential pokemon to add to your list. \nType 'getMost'"
+        + " to"
+        + "find the most powerful pokemon that you can add \nType 'getLeast' to find the least powerful "
+        + "pokemon to add \nType 'getAsc' to get all pokemon from least to most \nType 'getDes' to get all"
+        + "pokemon from most to least \nType 'x' to return to battlegroup mode\n");
+    String res = scnr.nextLine();
+    if (res.equalsIgnoreCase("getMost")) {
+      System.out.println(b.getBest().getName() + "is the strongest pokemon you can choose. "
+          + "Would you like to add this pokemon? Type Y if you do");
+      String resp = scnr.nextLine();
+      if (resp.equalsIgnoreCase("Y")) {
+        try {
+          b.addToTeam(b.getBest());
+          System.out.println(b.getBest().getName() + " has been added to your battlegroup");
+        }
+        catch  (IllegalArgumentException e) {
+          System.out.println(b.getBest().getName() + " has  already been added to your battlegroup");
+        }
+      }
+      else {
+        System.out.println(b.getBest().getName() + " has NOT been added to your battlegroup");
+      } //goes back to add without adding anything
+      
+    }
+    else if (res.equalsIgnoreCase("getLeast")) {
+      System.out.println(b.getWorst().getName() + "is the weakest pokemon you can choose. "
+          + "Would you like to add this pokemon? Type Y if you do");
+      String resp = scnr.nextLine();
+      if (resp.equalsIgnoreCase("Y")) {
+        try {
+          b.addToTeam(b.getWorst());
+          System.out.println(b.getWorst().getName() + " has been added to your battlegroup");
+        }
+        catch  (IllegalArgumentException e) {
+          System.out.println(b.getWorst().getName() + " has already been added to your battlegroup");
+        }
+        
+      }
+      else {
+        System.out.println(b.getWorst().getName() + " has NOT been added to your battlegroup");
+      }//goes back to add without adding anything
+    }
+    else if (res.equalsIgnoreCase("getAsc")) {
+      
+      PokemonInterface[] array = b.getAscending();
+      boolean exit = false;
+      int page = 0;
+      System.out.println("Here is a list of all potential pokemon in ascending order. ");
+      
+      while ( exit == false) {
+        if (page == 0) {
+          System.out.println("Press x to go to the next page, or the number to th"
+              + "e left of which pokemon you want to pick");
+        }
+          else if (((page +1)*3) >= array.length) {
+            System.out.println("Press y to go to the next page, or the number to t"
+                + "he left of which pokemon you want to pick");
+          
+        }
+          else {
+            System.out.println("Press x to go to the next page, y to go to the previous pag"
+                + "e, or the number to the left of which pokemon you want to pick");
+          }
+        getAschelp(page, array);
+        String next = scnr.nextLine();
+        if ((next.equalsIgnoreCase("x")) && ((page + 1)*3 < array.length)) {
+          page++;
+        }
+        else if ((next.equalsIgnoreCase("y")) && (page-1 >= 0)) {
+          page--;
+        }
+        else if ((next.equals("1")) || (next.equals("2")) || (next.equals("3"))){
+          int j = Integer.parseInt(next);
+          try {
+            b.addToTeam(array[page*3 + j -1]);
+            System.out.println(array[page*3 + j -1].getName() + " has been added to your battlegroup");
+            exit = true;
+          }
+          catch (IllegalArgumentException e) {
+            System.out.println(array[page*3 + j -1].getName() + " has already been adde"
+                + "d, can't add same pokemon");
+            exit = true;
+          }
+        }
+      }
+    }
+    else if (res.equalsIgnoreCase("getDes")) {
+      PokemonInterface[] array = b.getDescending();
+      boolean exit = false;
+      int page = 0; //the page we're on right now
+      while ( exit == false) {
+        if (page == 0) {
+          System.out.println("Press x to go to the next page, or the number to th"
+              + "e left of which pokemon you want to pick"); //going to next page on page zero
+        }
+          else if (((page +1)*3) >= array.length) {
+            System.out.println("Press y to go to the next page, or the number to t"
+                + "he left of which pokemon you want to pick");
+          //going to previous page on the max page
+        }
+          else {  //going to next page or previous in middle
+            System.out.println("Press x to go to the next page, y to go to the previous pag"
+                + "e, or the number to the left of which pokemon you want to pick");
+          }
+        getAschelp(page, array);
+        String next = scnr.nextLine();
+        if ((next.equalsIgnoreCase("x")) && ((page + 1)*3 < array.length)) {
+          page++;
+        }
+        else if ((next.equalsIgnoreCase("x")) && (page-1 >= 0)) {
+          page--;
+        }
+        else if ((next.equals("1")) || (next.equals("2")) || (next.equals("3"))){ //adding a pokemon to team
+          int j = Integer.parseInt(next);
+          try {
+            b.addToTeam(array[page*3 + j -1]);
+            System.out.println(array[page*3 + j -1].getName() + " has been added to your battlegroup");
+            exit = true;
+          }
+          catch (IllegalArgumentException e) {
+            System.out.println(array[page*3 + j -1].getName() + " has already been adde"
+                + "d, can't add same pokemon");
+            exit = true;
+          }
+      }
+    }
+    }
+    else if (res.equalsIgnoreCase("x")) {
+      System.out.println("Returning to Battlegroup mode");
+      return;
+     
+    }
+  
+    else {
+      System.out.println("Not a valid input, please try again");
+    }
+  }while (!validinput);
+}
+
+
+
+/**
+ * This is a helper method for printing the contents of getAsc and getDes
+ * @param page what page is currently being printed
+ * @param array the array that is being printed
+ */
+  private static void getAschelp(int page, PokemonInterface[] array) {
+    for (int i = page*3; i < page*3 + 3; i++) {
+      if ((i +1) > array.length) {
+        break;
+      }
+      //this prints the contents of getAsc 3 at a time, and user can scroll through to see 3 at at time. 
+      //There is a number near it, and this serves to help the user pick one, as they input a number later
+      System.out.println((i%3 +1) + ": " + array[i]);
+    }
+    
+    
+  }
+}
